@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="아이폰에서 빠르게 숫자만 넣고 권장 발주량을 계산하는 세로형 발주 계산기"
+    />
+    <meta name="theme-color" content="#20352c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="발주 계산기" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <title>발주 계산기</title>
+    <style>
+      :root {
+        --safe-top: calc(env(safe-area-inset-top, 0px) + 14px);
+        --safe-bottom: max(env(safe-area-inset-bottom, 0px), 18px);
+        --bg-top: #eef7ee;
+        --bg-bottom: #d9ebdb;
+        --surface: rgba(255, 255, 255, 0.86);
+        --surface-strong: rgba(255, 255, 255, 0.96);
+        --surface-muted: rgba(240, 246, 241, 0.95);
+        --border: rgba(25, 51, 37, 0.1);
+        --text: #152319;
+        --muted: #5b6f61;
+        --accent: #2e8b57;
+        --accent-strong: #1c6b42;
+        --accent-soft: rgba(46, 139, 87, 0.12);
+        --danger: #b74034;
+        --shadow: 0 18px 42px rgba(31, 50, 38, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        background:
+          radial-gradient(circle at top left, rgba(121, 184, 142, 0.25), transparent 34%),
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.6), transparent 26%),
+          linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+        color: var(--text);
+        font-family: "Avenir Next", "Trebuchet MS", "Apple SD Gothic Neo", "Malgun Gothic",
+          sans-serif;
+      }
+
+      .app {
+        width: min(100vw, 480px);
+        min-height: 100vh;
+        padding: 0 14px calc(var(--safe-bottom) + 18px);
+      }
+
+      .top-safe-space {
+        height: var(--safe-top);
+      }
+
+      .shell {
+        display: grid;
+        gap: 12px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 10px;
+        padding: 4px 2px 2px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(32, 53, 44, 0.08);
+        color: var(--accent-strong);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 33px;
+        line-height: 1;
+        letter-spacing: -0.03em;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+      }
+
+      .section {
+        padding: 14px;
+      }
+
+      .section + .section {
+        border-top: 1px solid rgba(21, 35, 25, 0.06);
+      }
+
+      .summary-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .summary-card {
+        display: grid;
+        gap: 6px;
+        padding: 14px;
+        border-radius: 20px;
+        background: var(--surface-muted);
+        border: 1px solid rgba(21, 35, 25, 0.06);
+      }
+
+      .summary-label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .summary-value {
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .summary-sub {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .note {
+        margin: 0;
+        padding: 14px;
+        border-radius: 20px;
+        background: rgba(46, 139, 87, 0.08);
+        color: #264433;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .section-head {
+        display: grid;
+        gap: 4px;
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .section-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .field-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .field-card {
+        display: grid;
+        gap: 8px;
+        padding: 12px;
+        border-radius: 22px;
+        background: var(--surface-strong);
+        border: 1px solid rgba(21, 35, 25, 0.08);
+      }
+
+      .field-top {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .field-index {
+        display: inline-grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        font-size: 13px;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      .field-meta {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .field-label {
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .field-hint {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .field-input {
+        width: 100%;
+        min-height: 60px;
+        border: 1px solid rgba(21, 35, 25, 0.08);
+        border-radius: 18px;
+        padding: 0 16px;
+        background: #fbfdfb;
+        color: var(--text);
+        font: inherit;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        appearance: none;
+      }
+
+      .field-input::placeholder {
+        color: rgba(91, 111, 97, 0.45);
+      }
+
+      .field-input:focus {
+        outline: 2px solid rgba(46, 139, 87, 0.16);
+        border-color: rgba(46, 139, 87, 0.28);
+      }
+
+      .feedback {
+        min-height: 20px;
+        margin-top: 10px;
+        color: var(--danger);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .result-card {
+        display: grid;
+        gap: 14px;
+        padding: 14px;
+        border-radius: 24px;
+        background:
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.62), transparent 26%),
+          linear-gradient(180deg, rgba(46, 139, 87, 0.18), rgba(46, 139, 87, 0.08));
+        border: 1px solid rgba(46, 139, 87, 0.18);
+        scroll-margin-top: calc(var(--safe-top) + 14px);
+      }
+
+      .result-head {
+        display: grid;
+        gap: 6px;
+      }
+
+      .result-label {
+        color: rgba(21, 35, 25, 0.72);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .result-main {
+        font-size: 48px;
+        font-weight: 900;
+        line-height: 0.95;
+        letter-spacing: -0.05em;
+      }
+
+      .result-copy {
+        margin: 0;
+        color: #264433;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .metric-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metric {
+        display: grid;
+        gap: 4px;
+        padding: 12px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.62);
+        border: 1px solid rgba(21, 35, 25, 0.06);
+      }
+
+      .metric-label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .metric-value {
+        font-size: 20px;
+        font-weight: 800;
+        line-height: 1.1;
+      }
+
+      .action-row {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .action {
+        min-height: 54px;
+        border: 0;
+        border-radius: 18px;
+        font: inherit;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .action.primary {
+        color: #f7fff9;
+        background: linear-gradient(180deg, #2f8e59 0%, #1f6f44 100%);
+        box-shadow: 0 14px 28px rgba(31, 111, 68, 0.22);
+      }
+
+      .action.secondary {
+        color: var(--text);
+        background: rgba(21, 35, 25, 0.06);
+      }
+
+      .helper {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      code {
+        padding: 2px 6px;
+        border-radius: 8px;
+        background: rgba(21, 35, 25, 0.06);
+        color: var(--accent-strong);
+        font-family: "SFMono-Regular", "Menlo", monospace;
+        font-size: 0.95em;
+      }
+
+      @media (max-width: 390px) {
+        h1 {
+          font-size: 30px;
+        }
+
+        .summary-grid,
+        .metric-grid,
+        .action-row {
+          grid-template-columns: 1fr;
+        }
+
+        .field-input {
+          font-size: 26px;
+        }
+
+        .result-main {
+          font-size: 42px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <div class="top-safe-space" aria-hidden="true"></div>
+
+      <div class="shell">
+        <section class="hero">
+          <span class="eyebrow">Order Utility</span>
+          <h1>발주 계산기</h1>
+          <p class="subtitle">
+            숫자만 순서대로 입력하고 마지막 칸에서 완료를 누르면 권장 발주량을 바로 보여줘.
+          </p>
+        </section>
+
+        <section class="card">
+          <div class="section">
+            <div class="summary-grid">
+              <div class="summary-card">
+                <span class="summary-label">상품명</span>
+                <strong class="summary-value">예시 상품: 제로콜라 355ml</strong>
+                <span class="summary-sub">예시값으로 고정해뒀고 계산에는 영향을 주지 않아.</span>
+              </div>
+              <div class="summary-card">
+                <span class="summary-label">입고일</span>
+                <strong class="summary-value" id="arrivalDate">-</strong>
+                <span class="summary-sub" id="arrivalMeta">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <p class="note">
+              계산 기준은 <strong>최근 3일 평균</strong>과 <strong>최근 7일 평균</strong> 중 더 큰 하루
+              판매량이야. 부족 수량이 생기면 <strong>입수단위</strong>에 맞춰 올림해서 권장 발주량을
+              보여줘.
+            </p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section">
+            <div class="section-head">
+              <h2 class="section-title">빠른 입력</h2>
+              <p class="section-copy">
+                아이폰에서 <code>다음</code>으로 한 칸씩 이동하도록 맞췄어. 마지막 칸에서
+                <code>완료</code>를 누르면 바로
+                계산돼.
+              </p>
+            </div>
+
+            <form id="orderForm" novalidate>
+              <div class="field-list">
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">1</span>
+                    <span class="field-meta">
+                      <span class="field-label">입수단위</span>
+                      <span class="field-hint">한 번 주문할 때 맞춰야 하는 최소 수량</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input"
+                    id="unitSize"
+                    name="unitSize"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="0"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="입수단위"
+                    autofocus
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">2</span>
+                    <span class="field-meta">
+                      <span class="field-label">현재 재고</span>
+                      <span class="field-hint">지금 바로 판매 가능한 수량</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input"
+                    id="currentStock"
+                    name="currentStock"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="0"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="현재 재고"
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">3</span>
+                    <span class="field-meta">
+                      <span class="field-label">하루전 판매량</span>
+                      <span class="field-hint">어제 판매한 수량</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input"
+                    id="sales1"
+                    name="sales1"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="0"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="하루전 판매량"
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">4</span>
+                    <span class="field-meta">
+                      <span class="field-label">이틀전 판매량</span>
+                      <span class="field-hint">그제 판매한 수량</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input"
+                    id="sales2"
+                    name="sales2"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="0"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="이틀전 판매량"
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">5</span>
+                    <span class="field-meta">
+                      <span class="field-label">삼일전 판매량</span>
+                      <span class="field-hint">3일 전 판매한 수량</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input"
+                    id="sales3"
+                    name="sales3"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="0"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="삼일전 판매량"
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">6</span>
+                    <span class="field-meta">
+                      <span class="field-label">최근 7일 총판매량</span>
+                      <span class="field-hint">최근 7일 합계를 한 번에 입력</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input"
+                    id="sales7"
+                    name="sales7"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="0"
+                    enterkeyhint="done"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="최근 7일 총판매량"
+                  />
+                </label>
+              </div>
+
+              <div class="feedback" id="feedback" aria-live="polite"></div>
+
+              <div class="action-row">
+                <button class="action primary" type="submit">계산하기</button>
+                <button class="action secondary" type="button" id="resetButton">새 계산</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section">
+            <div class="result-card" id="resultCard">
+              <div class="result-head">
+                <span class="result-label">권장 발주량</span>
+                <strong class="result-main" id="orderValue">-</strong>
+                <p class="result-copy" id="resultCopy">
+                  필수 입력값 6개를 채우면 입고일까지 필요한 수량을 계산해줄게.
+                </p>
+              </div>
+
+              <div class="metric-grid">
+                <div class="metric">
+                  <span class="metric-label">최근 3일 평균</span>
+                  <strong class="metric-value" id="avg3Value">-</strong>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">최근 7일 평균</span>
+                  <strong class="metric-value" id="avg7Value">-</strong>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">입고 전 예상 소진량</span>
+                  <strong class="metric-value" id="expectedValue">-</strong>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">부족 수량</span>
+                  <strong class="metric-value" id="shortageValue">-</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <p class="helper">
+              계산식: <code>max(최근 3일 평균, 최근 7일 평균) × 입고까지 남은 일수</code>로 예상
+              소진량을 구한 뒤, 현재 재고를 빼고 부족분을 입수단위로 올림해 권장 발주량을 계산해.
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const DAY_OFFSET = 2;
+      const numberFormatter = new Intl.NumberFormat("ko-KR", {
+        maximumFractionDigits: 1,
+      });
+
+      const form = document.getElementById("orderForm");
+      const feedback = document.getElementById("feedback");
+      const resetButton = document.getElementById("resetButton");
+      const resultCard = document.getElementById("resultCard");
+      const arrivalDate = document.getElementById("arrivalDate");
+      const arrivalMeta = document.getElementById("arrivalMeta");
+
+      const fields = Array.from(document.querySelectorAll("[data-field]"));
+
+      const results = {
+        order: document.getElementById("orderValue"),
+        copy: document.getElementById("resultCopy"),
+        avg3: document.getElementById("avg3Value"),
+        avg7: document.getElementById("avg7Value"),
+        expected: document.getElementById("expectedValue"),
+        shortage: document.getElementById("shortageValue"),
+      };
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const inboundDate = new Date(today);
+      inboundDate.setDate(today.getDate() + DAY_OFFSET);
+
+      const absoluteDate = new Intl.DateTimeFormat("ko-KR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(inboundDate);
+
+      arrivalDate.textContent = absoluteDate;
+      arrivalMeta.textContent = `오늘 기준 ${DAY_OFFSET}일 뒤 입고`;
+
+      function formatValue(value) {
+        return `${numberFormatter.format(value)}개`;
+      }
+
+      function resetResult(message = "필수 입력값 6개를 채우면 입고일까지 필요한 수량을 계산해줄게.") {
+        results.order.textContent = "-";
+        results.copy.textContent = message;
+        results.avg3.textContent = "-";
+        results.avg7.textContent = "-";
+        results.expected.textContent = "-";
+        results.shortage.textContent = "-";
+      }
+
+      function showError(message) {
+        feedback.textContent = message;
+      }
+
+      function clearError() {
+        feedback.textContent = "";
+      }
+
+      function sanitizeInputValue(value) {
+        return value.replace(/[^\d]/g, "");
+      }
+
+      function focusField(field) {
+        try {
+          field.focus({ preventScroll: true });
+        } catch (error) {
+          field.focus();
+        }
+        field.select();
+        field.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+
+      function allFieldsFilled() {
+        return fields.every((field) => field.value.trim() !== "");
+      }
+
+      function readValue(field, { allowZero = true } = {}) {
+        const raw = field.value.trim();
+        if (raw === "") {
+          return { error: `${field.dataset.label} 값을 입력해줘.` };
+        }
+
+        const value = Number.parseInt(raw, 10);
+        if (!Number.isFinite(value)) {
+          return { error: `${field.dataset.label}은 숫자로만 입력해줘.` };
+        }
+
+        if (!allowZero && value <= 0) {
+          return { error: `${field.dataset.label}은 1 이상이어야 해.` };
+        }
+
+        if (value < 0) {
+          return { error: `${field.dataset.label}은 0 이상이어야 해.` };
+        }
+
+        return { value };
+      }
+
+      function calculate({ scrollToResult = false } = {}) {
+        clearError();
+
+        const entries = [
+          {
+            field: document.getElementById("unitSize"),
+            parsed: readValue(document.getElementById("unitSize"), { allowZero: false }),
+          },
+          {
+            field: document.getElementById("currentStock"),
+            parsed: readValue(document.getElementById("currentStock")),
+          },
+          {
+            field: document.getElementById("sales1"),
+            parsed: readValue(document.getElementById("sales1")),
+          },
+          {
+            field: document.getElementById("sales2"),
+            parsed: readValue(document.getElementById("sales2")),
+          },
+          {
+            field: document.getElementById("sales3"),
+            parsed: readValue(document.getElementById("sales3")),
+          },
+          {
+            field: document.getElementById("sales7"),
+            parsed: readValue(document.getElementById("sales7")),
+          },
+        ];
+
+        const invalidEntry = entries.find((entry) => entry.parsed.error);
+
+        if (invalidEntry) {
+          showError(invalidEntry.parsed.error);
+          focusField(invalidEntry.field);
+          return false;
+        }
+
+        const [unitSize, currentStock, sales1, sales2, sales3, sales7] = entries.map(
+          (entry) => entry.parsed
+        );
+
+        const recent3Average = (sales1.value + sales2.value + sales3.value) / 3;
+        const recent7Average = sales7.value / 7;
+        const baseDailySales = Math.max(recent3Average, recent7Average);
+        const expectedDemand = baseDailySales * DAY_OFFSET;
+        const shortage = Math.max(0, expectedDemand - currentStock.value);
+        const recommendedOrder =
+          shortage > 0 ? Math.ceil(shortage / unitSize.value) * unitSize.value : 0;
+        const orderUnits = recommendedOrder > 0 ? recommendedOrder / unitSize.value : 0;
+
+        results.order.textContent = formatValue(recommendedOrder);
+        results.avg3.textContent = formatValue(recent3Average);
+        results.avg7.textContent = formatValue(recent7Average);
+        results.expected.textContent = formatValue(expectedDemand);
+        results.shortage.textContent = formatValue(shortage);
+
+        if (recommendedOrder === 0) {
+          results.copy.textContent = `현재 재고 ${formatValue(
+            currentStock.value
+          )}로 ${absoluteDate} 입고 전까지 버틸 수 있어.`;
+        } else {
+          results.copy.textContent = `부족 수량 ${formatValue(shortage)}을 입수단위 ${formatValue(
+            unitSize.value
+          )}에 맞춰 올림해서 ${orderUnits}묶음, 총 ${formatValue(recommendedOrder)}를 권장해.`;
+        }
+
+        if (scrollToResult) {
+          resultCard.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+
+        return true;
+      }
+
+      fields.forEach((field, index) => {
+        field.addEventListener("focus", () => {
+          field.select();
+        });
+
+        field.addEventListener("input", () => {
+          const sanitized = sanitizeInputValue(field.value);
+          if (field.value !== sanitized) {
+            field.value = sanitized;
+          }
+
+          if (allFieldsFilled()) {
+            calculate();
+          } else {
+            clearError();
+            resetResult();
+          }
+        });
+
+        field.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter") {
+            return;
+          }
+
+          event.preventDefault();
+
+          if (field.value.trim() === "") {
+            showError(`${field.dataset.label} 값을 입력해줘.`);
+            return;
+          }
+
+          const nextField = fields[index + 1];
+          if (nextField) {
+            focusField(nextField);
+            clearError();
+            return;
+          }
+
+          const success = calculate({ scrollToResult: true });
+          if (success) {
+            field.blur();
+          }
+        });
+      });
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        calculate({ scrollToResult: true });
+      });
+
+      resetButton.addEventListener("click", () => {
+        form.reset();
+        clearError();
+        resetResult();
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+
+        requestAnimationFrame(() => {
+          focusField(fields[0]);
+        });
+      });
+
+      resetResult();
+    </script>
+  </body>
+</html>

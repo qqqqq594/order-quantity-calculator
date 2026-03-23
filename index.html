@@ -264,6 +264,19 @@
         border-color: rgba(46, 139, 87, 0.28);
       }
 
+      .field-input.date-input {
+        font-size: 20px;
+        letter-spacing: -0.02em;
+      }
+
+      .field-input.date-input::-webkit-date-and-time-value {
+        text-align: left;
+      }
+
+      .field-input.date-input::-webkit-calendar-picker-indicator {
+        opacity: 0.72;
+      }
+
       .feedback {
         min-height: 20px;
         margin-top: 10px;
@@ -433,8 +446,8 @@
           <div class="section">
             <p class="note">
               계산 기준은 <strong>최근 3일 평균</strong>과 <strong>최근 7일 평균</strong> 중 더 큰 하루
-              판매량이야. 부족 수량이 생기면 <strong>입수단위</strong>에 맞춰 올림해서 권장 발주량을
-              보여줘.
+              판매량이야. <strong>예정 입고</strong>는 기준 입고일보다 빠르거나 같은 날짜만 반영하고,
+              부족 수량이 생기면 <strong>입수단위</strong>에 맞춰 올림해서 권장 발주량을 보여줘.
             </p>
           </div>
         </section>
@@ -445,8 +458,8 @@
               <h2 class="section-title">빠른 입력</h2>
               <p class="section-copy">
                 아이폰에서 <code>다음</code>으로 한 칸씩 이동하도록 맞췄어. 마지막 칸에서
-                <code>완료</code>를 누르면 바로
-                계산돼.
+                <code>완료</code>를 누르면 바로 계산돼. 예정 입고는 최대 2건까지 선택 입력으로 둘 수
+                있어.
               </p>
             </div>
 
@@ -472,6 +485,7 @@
                     autocomplete="off"
                     spellcheck="false"
                     data-field
+                    data-required="true"
                     data-label="입수단위"
                     autofocus
                   />
@@ -480,6 +494,96 @@
                 <label class="field-card">
                   <div class="field-top">
                     <span class="field-index">2</span>
+                    <span class="field-meta">
+                      <span class="field-label">예정 입고일 1</span>
+                      <span class="field-hint">선택 입력. 비워두면 계산에서 제외돼.</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input date-input"
+                    id="scheduledDate1"
+                    name="scheduledDate1"
+                    type="date"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="예정 입고일 1"
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">3</span>
+                    <span class="field-meta">
+                      <span class="field-label">예정 입고량 1</span>
+                      <span class="field-hint">날짜와 함께 입력하면 발주 계산에 반영돼.</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input"
+                    id="scheduledQty1"
+                    name="scheduledQty1"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="0"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="예정 입고량 1"
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">4</span>
+                    <span class="field-meta">
+                      <span class="field-label">예정 입고일 2</span>
+                      <span class="field-hint">두 번째 예정 입고가 있으면 추가로 입력해.</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input date-input"
+                    id="scheduledDate2"
+                    name="scheduledDate2"
+                    type="date"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="예정 입고일 2"
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">5</span>
+                    <span class="field-meta">
+                      <span class="field-label">예정 입고량 2</span>
+                      <span class="field-hint">날짜와 함께 입력하면 발주 계산에 반영돼.</span>
+                    </span>
+                  </div>
+                  <input
+                    class="field-input"
+                    id="scheduledQty2"
+                    name="scheduledQty2"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="0"
+                    enterkeyhint="next"
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-field
+                    data-label="예정 입고량 2"
+                  />
+                </label>
+
+                <label class="field-card">
+                  <div class="field-top">
+                    <span class="field-index">6</span>
                     <span class="field-meta">
                       <span class="field-label">현재 재고</span>
                       <span class="field-hint">지금 바로 판매 가능한 수량</span>
@@ -497,13 +601,14 @@
                     autocomplete="off"
                     spellcheck="false"
                     data-field
+                    data-required="true"
                     data-label="현재 재고"
                   />
                 </label>
 
                 <label class="field-card">
                   <div class="field-top">
-                    <span class="field-index">3</span>
+                    <span class="field-index">7</span>
                     <span class="field-meta">
                       <span class="field-label">하루전 판매량</span>
                       <span class="field-hint">어제 판매한 수량</span>
@@ -521,13 +626,14 @@
                     autocomplete="off"
                     spellcheck="false"
                     data-field
+                    data-required="true"
                     data-label="하루전 판매량"
                   />
                 </label>
 
                 <label class="field-card">
                   <div class="field-top">
-                    <span class="field-index">4</span>
+                    <span class="field-index">8</span>
                     <span class="field-meta">
                       <span class="field-label">이틀전 판매량</span>
                       <span class="field-hint">그제 판매한 수량</span>
@@ -545,13 +651,14 @@
                     autocomplete="off"
                     spellcheck="false"
                     data-field
+                    data-required="true"
                     data-label="이틀전 판매량"
                   />
                 </label>
 
                 <label class="field-card">
                   <div class="field-top">
-                    <span class="field-index">5</span>
+                    <span class="field-index">9</span>
                     <span class="field-meta">
                       <span class="field-label">삼일전 판매량</span>
                       <span class="field-hint">3일 전 판매한 수량</span>
@@ -569,13 +676,14 @@
                     autocomplete="off"
                     spellcheck="false"
                     data-field
+                    data-required="true"
                     data-label="삼일전 판매량"
                   />
                 </label>
 
                 <label class="field-card">
                   <div class="field-top">
-                    <span class="field-index">6</span>
+                    <span class="field-index">10</span>
                     <span class="field-meta">
                       <span class="field-label">최근 7일 총판매량</span>
                       <span class="field-hint">최근 7일 합계를 한 번에 입력</span>
@@ -593,6 +701,7 @@
                     autocomplete="off"
                     spellcheck="false"
                     data-field
+                    data-required="true"
                     data-label="최근 7일 총판매량"
                   />
                 </label>
@@ -629,6 +738,14 @@
                   <strong class="metric-value" id="avg7Value">-</strong>
                 </div>
                 <div class="metric">
+                  <span class="metric-label">기준 하루 판매량</span>
+                  <strong class="metric-value" id="baseDailyValue">-</strong>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">반영 예정 입고량</span>
+                  <strong class="metric-value" id="scheduledInboundValue">-</strong>
+                </div>
+                <div class="metric">
                   <span class="metric-label">입고 전 예상 소진량</span>
                   <strong class="metric-value" id="expectedValue">-</strong>
                 </div>
@@ -643,7 +760,8 @@
           <div class="section">
             <p class="helper">
               계산식: <code>max(최근 3일 평균, 최근 7일 평균) × 입고까지 남은 일수</code>로 예상
-              소진량을 구한 뒤, 현재 재고를 빼고 부족분을 입수단위로 올림해 권장 발주량을 계산해.
+              소진량을 구한 뒤, 현재 재고와 기준 입고일 이전 예정 입고를 반영하고 부족분을 입수단위로
+              올림해 권장 발주량을 계산해.
             </p>
           </div>
         </section>
@@ -664,12 +782,27 @@
       const arrivalMeta = document.getElementById("arrivalMeta");
 
       const fields = Array.from(document.querySelectorAll("[data-field]"));
+      const requiredFields = fields.filter((field) => field.dataset.required === "true");
+      const scheduledPairs = [
+        {
+          label: "예정 입고 1",
+          dateField: document.getElementById("scheduledDate1"),
+          qtyField: document.getElementById("scheduledQty1"),
+        },
+        {
+          label: "예정 입고 2",
+          dateField: document.getElementById("scheduledDate2"),
+          qtyField: document.getElementById("scheduledQty2"),
+        },
+      ];
 
       const results = {
         order: document.getElementById("orderValue"),
         copy: document.getElementById("resultCopy"),
         avg3: document.getElementById("avg3Value"),
         avg7: document.getElementById("avg7Value"),
+        baseDaily: document.getElementById("baseDailyValue"),
+        scheduledInbound: document.getElementById("scheduledInboundValue"),
         expected: document.getElementById("expectedValue"),
         shortage: document.getElementById("shortageValue"),
       };
@@ -689,6 +822,13 @@
       arrivalDate.textContent = absoluteDate;
       arrivalMeta.textContent = `오늘 기준 ${DAY_OFFSET}일 뒤 입고`;
 
+      function formatDateInput(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
       function formatValue(value) {
         return `${numberFormatter.format(value)}개`;
       }
@@ -698,6 +838,8 @@
         results.copy.textContent = message;
         results.avg3.textContent = "-";
         results.avg7.textContent = "-";
+        results.baseDaily.textContent = "-";
+        results.scheduledInbound.textContent = "-";
         results.expected.textContent = "-";
         results.shortage.textContent = "-";
       }
@@ -714,21 +856,104 @@
         return value.replace(/[^\d]/g, "");
       }
 
+      function selectFieldValue(field) {
+        if (field.type === "date") {
+          return;
+        }
+
+        if (typeof field.select === "function") {
+          field.select();
+        }
+      }
+
       function focusField(field) {
         try {
           field.focus({ preventScroll: true });
         } catch (error) {
           field.focus();
         }
-        field.select();
+        selectFieldValue(field);
         field.scrollIntoView({
           behavior: "smooth",
           block: "center",
         });
       }
 
-      function allFieldsFilled() {
-        return fields.every((field) => field.value.trim() !== "");
+      function allRequiredFieldsFilled() {
+        return requiredFields.every((field) => field.value.trim() !== "");
+      }
+
+      function parseDateValue(field) {
+        const raw = field.value;
+        if (!raw) {
+          return { error: `${field.dataset.label}을 입력해줘.` };
+        }
+
+        const [year, month, day] = raw.split("-").map(Number);
+        const date = new Date(year, month - 1, day);
+        date.setHours(0, 0, 0, 0);
+
+        if (Number.isNaN(date.getTime())) {
+          return { error: `${field.dataset.label}을 다시 확인해줘.` };
+        }
+
+        return { value: date };
+      }
+
+      function parseScheduledArrival(pair, { strict = true } = {}) {
+        const hasDate = pair.dateField.value !== "";
+        const hasQty = pair.qtyField.value.trim() !== "";
+
+        if (!hasDate && !hasQty) {
+          return { active: false, included: false, quantity: 0 };
+        }
+
+        if (!hasDate) {
+          if (!strict) {
+            return { active: false, pending: true, included: false, quantity: 0 };
+          }
+
+          return {
+            error: `${pair.label} 날짜와 수량을 함께 입력해줘.`,
+            field: pair.dateField,
+          };
+        }
+
+        if (!hasQty) {
+          if (!strict) {
+            return { active: false, pending: true, included: false, quantity: 0 };
+          }
+
+          return {
+            error: `${pair.label} 날짜와 수량을 함께 입력해줘.`,
+            field: pair.qtyField,
+          };
+        }
+
+        const parsedDate = parseDateValue(pair.dateField);
+        if (parsedDate.error) {
+          if (!strict) {
+            return { active: false, pending: true, included: false, quantity: 0 };
+          }
+
+          return { error: parsedDate.error, field: pair.dateField };
+        }
+
+        const parsedQty = readValue(pair.qtyField, { allowZero: false });
+        if (parsedQty.error) {
+          if (!strict) {
+            return { active: false, pending: true, included: false, quantity: 0 };
+          }
+
+          return { error: parsedQty.error, field: pair.qtyField };
+        }
+
+        return {
+          active: true,
+          date: parsedDate.value,
+          quantity: parsedQty.value,
+          included: parsedDate.value.getTime() <= inboundDate.getTime(),
+        };
       }
 
       function readValue(field, { allowZero = true } = {}) {
@@ -753,7 +978,7 @@
         return { value };
       }
 
-      function calculate({ scrollToResult = false } = {}) {
+      function calculate({ scrollToResult = false, strict = true } = {}) {
         clearError();
 
         const entries = [
@@ -795,11 +1020,25 @@
           (entry) => entry.parsed
         );
 
+        const scheduledResults = scheduledPairs.map((pair) => parseScheduledArrival(pair, { strict }));
+        const invalidScheduled = scheduledResults.find((item) => item.error);
+
+        if (invalidScheduled) {
+          showError(invalidScheduled.error);
+          focusField(invalidScheduled.field);
+          return false;
+        }
+
         const recent3Average = (sales1.value + sales2.value + sales3.value) / 3;
         const recent7Average = sales7.value / 7;
         const baseDailySales = Math.max(recent3Average, recent7Average);
         const expectedDemand = baseDailySales * DAY_OFFSET;
-        const shortage = Math.max(0, expectedDemand - currentStock.value);
+        const scheduledInboundTotal = scheduledResults
+          .filter((item) => item.active && item.included)
+          .reduce((sum, item) => sum + item.quantity, 0);
+        const futureScheduled = scheduledResults.filter((item) => item.active && !item.included);
+        const futureScheduledTotal = futureScheduled.reduce((sum, item) => sum + item.quantity, 0);
+        const shortage = Math.max(0, expectedDemand - currentStock.value - scheduledInboundTotal);
         const recommendedOrder =
           shortage > 0 ? Math.ceil(shortage / unitSize.value) * unitSize.value : 0;
         const orderUnits = recommendedOrder > 0 ? recommendedOrder / unitSize.value : 0;
@@ -807,17 +1046,30 @@
         results.order.textContent = formatValue(recommendedOrder);
         results.avg3.textContent = formatValue(recent3Average);
         results.avg7.textContent = formatValue(recent7Average);
+        results.baseDaily.textContent = formatValue(baseDailySales);
+        results.scheduledInbound.textContent = formatValue(scheduledInboundTotal);
         results.expected.textContent = formatValue(expectedDemand);
         results.shortage.textContent = formatValue(shortage);
 
+        const scheduledCopy =
+          scheduledInboundTotal > 0 ? `예정 입고 ${formatValue(scheduledInboundTotal)}를 반영하면 ` : "";
+
         if (recommendedOrder === 0) {
-          results.copy.textContent = `현재 재고 ${formatValue(
+          results.copy.textContent = `${scheduledCopy}현재 재고 ${formatValue(
             currentStock.value
           )}로 ${absoluteDate} 입고 전까지 버틸 수 있어.`;
         } else {
-          results.copy.textContent = `부족 수량 ${formatValue(shortage)}을 입수단위 ${formatValue(
-            unitSize.value
-          )}에 맞춰 올림해서 ${orderUnits}묶음, 총 ${formatValue(recommendedOrder)}를 권장해.`;
+          results.copy.textContent = `${scheduledCopy}부족 수량 ${formatValue(
+            shortage
+          )}을 입수단위 ${formatValue(unitSize.value)}에 맞춰 올림해서 ${orderUnits}묶음, 총 ${formatValue(
+            recommendedOrder
+          )}를 권장해.`;
+        }
+
+        if (futureScheduledTotal > 0) {
+          results.copy.textContent += ` 기준 입고일 이후 예정 입고 ${formatValue(
+            futureScheduledTotal
+          )}는 이번 계산에서 제외했어.`;
         }
 
         if (scrollToResult) {
@@ -830,19 +1082,42 @@
         return true;
       }
 
+      const minDateValue = formatDateInput(today);
+      scheduledPairs.forEach((pair) => {
+        pair.dateField.min = minDateValue;
+      });
+
       fields.forEach((field, index) => {
         field.addEventListener("focus", () => {
-          field.select();
+          selectFieldValue(field);
         });
 
         field.addEventListener("input", () => {
-          const sanitized = sanitizeInputValue(field.value);
-          if (field.value !== sanitized) {
-            field.value = sanitized;
+          if (field.type !== "date") {
+            const sanitized = sanitizeInputValue(field.value);
+            if (field.value !== sanitized) {
+              field.value = sanitized;
+            }
           }
 
-          if (allFieldsFilled()) {
-            calculate();
+          if (allRequiredFieldsFilled()) {
+            calculate({ strict: false });
+          } else {
+            clearError();
+            resetResult();
+          }
+        });
+
+        field.addEventListener("change", () => {
+          if (field.type === "date" && field.value) {
+            const nextField = fields[index + 1];
+            if (nextField) {
+              focusField(nextField);
+            }
+          }
+
+          if (allRequiredFieldsFilled()) {
+            calculate({ strict: false });
           } else {
             clearError();
             resetResult();
@@ -856,19 +1131,32 @@
 
           event.preventDefault();
 
+          const nextField = fields[index + 1];
+          const isRequired = field.dataset.required === "true";
+
           if (field.value.trim() === "") {
+            if (!isRequired) {
+              clearError();
+              if (nextField) {
+                focusField(nextField);
+                return;
+              }
+
+              calculate({ scrollToResult: true, strict: true });
+              return;
+            }
+
             showError(`${field.dataset.label} 값을 입력해줘.`);
             return;
           }
 
-          const nextField = fields[index + 1];
           if (nextField) {
             focusField(nextField);
             clearError();
             return;
           }
 
-          const success = calculate({ scrollToResult: true });
+          const success = calculate({ scrollToResult: true, strict: true });
           if (success) {
             field.blur();
           }
@@ -877,7 +1165,7 @@
 
       form.addEventListener("submit", (event) => {
         event.preventDefault();
-        calculate({ scrollToResult: true });
+        calculate({ scrollToResult: true, strict: true });
       });
 
       resetButton.addEventListener("click", () => {
